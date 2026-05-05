@@ -173,7 +173,7 @@ or
 }
 ```
 or
-
+ 
 400 Bad Request – Insufficient balance or invalid amount
 404 Not Found – One or both accounts not found
 
