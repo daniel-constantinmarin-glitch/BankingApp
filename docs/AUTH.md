@@ -5,11 +5,11 @@ Authentication is stateless: the server does not store session information. Each
 
 # Authentication Overview
 
-A user logs in using username and password
-The server verifies the credentials
-A JWT is generated and returned to the client
-The client includes the token in subsequent requests
-The server validates the token before processing the request
+A user logs in using username and password.
+The server verifies the credentials.
+A JWT is generated and returned to the client.
+The client includes the token in subsequent requests.
+The server validates the token before processing the request.
 
 # Login Endpoint
 ## Authenticate User
