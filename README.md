@@ -64,7 +64,7 @@ src/test/java
 # Setup Instructions
 
 # Prerequisites
-- Java 17 or later
+- Java 25 or later
 - Maven
 
 # Running the Application
