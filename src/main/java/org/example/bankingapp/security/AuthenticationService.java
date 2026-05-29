@@ -1,5 +1,7 @@
 package org.example.bankingapp.security;
 
+import org.example.bankingapp.model.User;
+import org.example.bankingapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.example.bankingapp.dto.LoginRequest;
@@ -10,20 +12,22 @@ public class AuthenticationService {
     @Autowired
     private JwtService jwtService;
 
+
+    @Autowired
+    private UserRepository userRepository;
+
     public String login(LoginRequest request) {
 
-        if ("admin".equals(request.getUsername())
-                && "admin123".equals(request.getPassword())) {
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-            return jwtService.generateToken("admin", "ROLE_ADMIN");
+        if (!user.getPassword().equals(request.getPassword())) {
+            throw new RuntimeException("Invalid password");
         }
 
-        if ("user".equals(request.getUsername())
-                && "user123".equals(request.getPassword())) {
-
-            return jwtService.generateToken("user", "ROLE_USER");
-        }
-
-        throw new RuntimeException("Invalid credentials");
+        return jwtService.generateToken(
+                user.getUsername(),
+                user.getRole()
+        );
     }
 }
