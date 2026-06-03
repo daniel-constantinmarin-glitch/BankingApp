@@ -1,16 +1,33 @@
 package org.example.bankingapp.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.example.bankingapp.dto.CreateAccountRequest;
+import org.example.bankingapp.model.Account;
+import org.example.bankingapp.service.AccountService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/accounts")
 public class AccountController {
 
-    @GetMapping
-    public String userEndpoint() {
-        return "Hello User!";
+    private static final Logger log = LoggerFactory.getLogger(AccountController.class);
+
+    private final AccountService accountService;
+
+    public AccountController(AccountService accountService) {
+        this.accountService = accountService;
+    }
+
+    @PostMapping
+    public ResponseEntity<Account> createAccount(@RequestBody CreateAccountRequest request) {
+
+        log.info("Received request to create account for {}", request.getOwnerName());
+
+        Account account = accountService.createAccount(request);
+
+        return new ResponseEntity<>(account, HttpStatus.CREATED);
     }
 }
-
