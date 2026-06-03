@@ -1,6 +1,7 @@
 package org.example.bankingapp.service;
 
 import org.example.bankingapp.dto.CreateAccountRequest;
+import org.example.bankingapp.exception.AccountNotFoundException;
 import org.example.bankingapp.exception.InvalidAmountException;
 import org.example.bankingapp.model.Account;
 import org.example.bankingapp.repository.AccountRepository;
@@ -39,4 +40,31 @@ public class AccountService {
 
         return saved;
     }
+
+
+    public Account deposit(Long accountId, double amount) {
+
+        log.info("Deposit request: accountId={}, amount={}", accountId, amount);
+
+        if (amount <= 0) {
+            log.warn("Invalid deposit amount: {}", amount);
+            throw new InvalidAmountException("Deposit amount must be greater than 0");
+        }
+
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> {
+                    log.warn("Account not found with id {}", accountId);
+                    return new AccountNotFoundException("Account not found");
+                });
+
+        account.setBalance(account.getBalance() + amount);
+
+        Account updated = accountRepository.save(account);
+
+        log.info("Deposit successful for accountId={}, new balance={}",
+                accountId, updated.getBalance());
+
+        return updated;
+    }
+
 }

@@ -1,5 +1,6 @@
 package org.example.bankingapp.controller;
 
+import org.example.bankingapp.dto.AmountRequest;
 import org.example.bankingapp.dto.CreateAccountRequest;
 import org.example.bankingapp.model.Account;
 import org.example.bankingapp.service.AccountService;
@@ -30,4 +31,18 @@ public class AccountController {
 
         return new ResponseEntity<>(account, HttpStatus.CREATED);
     }
+
+
+    @PostMapping("/{id}/deposit")
+    public ResponseEntity<Account> deposit(
+            @PathVariable Long id,
+            @RequestBody AmountRequest request) {
+
+        log.info("Received deposit request for accountId={}", id);
+
+        Account updated = accountService.deposit(id, request.getAmount());
+
+        return ResponseEntity.ok(updated);
+    }
+
 }
