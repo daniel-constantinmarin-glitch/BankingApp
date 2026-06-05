@@ -2,6 +2,7 @@ package org.example.bankingapp.service;
 
 import org.example.bankingapp.dto.CreateAccountRequest;
 import org.example.bankingapp.exception.AccountNotFoundException;
+import org.example.bankingapp.exception.InsufficientBalanceException;
 import org.example.bankingapp.exception.InvalidAmountException;
 import org.example.bankingapp.model.Account;
 import org.example.bankingapp.repository.AccountRepository;
@@ -62,6 +63,39 @@ public class AccountService {
         Account updated = accountRepository.save(account);
 
         log.info("Deposit successful for accountId={}, new balance={}",
+                accountId, updated.getBalance());
+
+        return updated;
+    }
+
+
+    public Account withdraw(Long accountId, double amount) {
+
+        log.info("Withdraw request: accountId={}, amount={}", accountId, amount);
+
+        if (amount <= 0) {
+            log.warn("Invalid withdraw amount: {}", amount);
+            throw new InvalidAmountException("Withdraw amount must be greater than 0");
+        }
+
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> {
+                    log.warn("Account not found with id {}", accountId);
+                    return new AccountNotFoundException("Account not found");
+                });
+
+        if (account.getBalance() < amount) {
+            log.warn("Insufficient balance for accountId={}, currentBalance={}, requested={}",
+                    accountId, account.getBalance(), amount);
+
+            throw new InsufficientBalanceException("Insufficient balance");
+        }
+
+        account.setBalance(account.getBalance() - amount);
+
+        Account updated = accountRepository.save(account);
+
+        log.info("Withdraw successful for accountId={}, new balance={}",
                 accountId, updated.getBalance());
 
         return updated;

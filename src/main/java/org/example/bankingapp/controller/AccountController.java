@@ -45,4 +45,18 @@ public class AccountController {
         return ResponseEntity.ok(updated);
     }
 
+
+    @PostMapping("/{id}/withdraw")
+    public ResponseEntity<Account> withdraw(
+            @PathVariable Long id,
+            @RequestBody AmountRequest request) {
+
+        log.info("Received withdraw request for accountId={}", id);
+
+        Account updated = accountService.withdraw(id, request.getAmount());
+
+        return ResponseEntity.ok(updated);
+    }
+
+
 }
