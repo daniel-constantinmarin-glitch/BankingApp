@@ -3,6 +3,7 @@ package org.example.bankingapp.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -28,8 +29,15 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/accounts/**").hasAnyRole("USER", "ADMIN")
+
+                        // ADMIN only
+                        .requestMatchers(HttpMethod.POST, "/api/accounts").hasRole("ADMIN")
+                        .requestMatchers("/api/accounts/transfer").hasRole("ADMIN")
+
+                        // USER + ADMIN
+                        .requestMatchers("/api/accounts/*/deposit").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/accounts/*/withdraw").hasAnyRole("USER", "ADMIN")
+
                         .anyRequest().authenticated()
                 )
 

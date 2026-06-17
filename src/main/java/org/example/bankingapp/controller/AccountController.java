@@ -2,6 +2,7 @@ package org.example.bankingapp.controller;
 
 import org.example.bankingapp.dto.AmountRequest;
 import org.example.bankingapp.dto.CreateAccountRequest;
+import org.example.bankingapp.dto.TransferRequest;
 import org.example.bankingapp.model.Account;
 import org.example.bankingapp.service.AccountService;
 import org.slf4j.Logger;
@@ -58,5 +59,20 @@ public class AccountController {
         return ResponseEntity.ok(updated);
     }
 
+
+    @PostMapping("/transfer")
+    public ResponseEntity<String> transfer(@RequestBody TransferRequest request) {
+
+        log.info("Received transfer request: from={} to={}",
+                request.getFromAccountId(), request.getToAccountId());
+
+        accountService.transfer(
+                request.getFromAccountId(),
+                request.getToAccountId(),
+                request.getAmount()
+        );
+
+        return ResponseEntity.ok("Transfer completed successfully");
+    }
 
 }
