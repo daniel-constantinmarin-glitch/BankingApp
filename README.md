@@ -66,6 +66,9 @@ src/test/java
 # Prerequisites
 - Java 25 or later
 - Maven
+- IntelliJ IDEA / Eclipse (optional but recommended)
+- Internet connection (for dependencies)
+
 
 # Running the Application
 
@@ -93,3 +96,11 @@ H2 Console:
 - Password: (empty)
 
 
+# Swagger UI (API Documentation)
+
+- http://localhost:8080/swagger-ui/index.html
+
+
+# Default users
+- Role: Admin, username: admin, password: admin123
+- Role: User, username: user, password: user123

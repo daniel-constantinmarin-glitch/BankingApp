@@ -9,6 +9,7 @@ import org.example.bankingapp.repository.AccountRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AccountService {
@@ -99,6 +100,50 @@ public class AccountService {
                 accountId, updated.getBalance());
 
         return updated;
+    }
+
+
+    @Transactional
+    public void transfer(Long fromId, Long toId, double amount) {
+
+        log.info("Transfer request: from={}, to={}, amount={}", fromId, toId, amount);
+
+        if (amount <= 0) {
+            log.warn("Invalid transfer amount: {}", amount);
+            throw new InvalidAmountException("Transfer amount must be greater than 0");
+        }
+
+        if (fromId.equals(toId)) {
+            log.warn("Transfer to same account: {}", fromId);
+            throw new InvalidAmountException("Cannot transfer to the same account");
+        }
+
+        Account fromAccount = accountRepository.findById(fromId)
+                .orElseThrow(() -> {
+                    log.warn("Source account not found: {}", fromId);
+                    return new AccountNotFoundException("Source account not found");
+                });
+
+        Account toAccount = accountRepository.findById(toId)
+                .orElseThrow(() -> {
+                    log.warn("Destination account not found: {}", toId);
+                    return new AccountNotFoundException("Destination account not found");
+                });
+
+        if (fromAccount.getBalance() < amount) {
+            log.warn("Insufficient balance: fromAccount={}, balance={}, requested={}",
+                    fromId, fromAccount.getBalance(), amount);
+
+            throw new InsufficientBalanceException("Insufficient balance");
+        }
+
+        fromAccount.setBalance(fromAccount.getBalance() - amount);
+        toAccount.setBalance(toAccount.getBalance() + amount);
+
+        accountRepository.save(fromAccount);
+        accountRepository.save(toAccount);
+
+        log.info("Transfer successful: {} -> {} amount={}", fromId, toId, amount);
     }
 
 }
