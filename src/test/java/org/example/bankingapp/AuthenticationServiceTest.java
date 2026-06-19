@@ -2,6 +2,7 @@ package org.example.bankingapp;
 
 import org.example.bankingapp.dto.LoginRequest;
 import org.example.bankingapp.security.AuthenticationService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,6 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 
 
 @SpringBootTest
@@ -24,6 +27,11 @@ class AuthenticationServiceTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @BeforeEach
+    void clearContext() {
+        SecurityContextHolder.clearContext();
+    }
 
     @Test
     void shouldReturnTokenForAdmin() {

@@ -10,6 +10,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -24,10 +28,17 @@ class AccountIntegrationTest {
     @Autowired
     private AuthenticationService authService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private ObjectMapper objectMapper = new ObjectMapper();
+
 
     private String adminToken;
+
+
+    @BeforeEach
+    void clearContext() {
+        SecurityContextHolder.clearContext();
+    }
+
 
     @BeforeEach
     void setup() {

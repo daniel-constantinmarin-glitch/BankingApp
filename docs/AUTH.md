@@ -52,7 +52,10 @@ Requests without a valid token will be rejected.
 All endpoints under the following paths require authentication:
 
 /api/accounts/**
-/api/transactions/**
+/api/accounts/{id}/deposit
+/api/accounts/{id}/withdraw
+api/accounts/transfer
+/api/auth/login
 
 Endpoints under /api/auth/** are publicly accessible.
 

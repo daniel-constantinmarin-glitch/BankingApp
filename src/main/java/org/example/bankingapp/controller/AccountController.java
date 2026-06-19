@@ -1,78 +1,67 @@
 package org.example.bankingapp.controller;
 
-import org.example.bankingapp.dto.AmountRequest;
-import org.example.bankingapp.dto.CreateAccountRequest;
-import org.example.bankingapp.dto.TransferRequest;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import org.example.bankingapp.dto.*;
 import org.example.bankingapp.model.Account;
 import org.example.bankingapp.service.AccountService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/accounts")
+
+@Tag(name = "Account Controller", description = "Bank account operations")
 public class AccountController {
 
-    private static final Logger log = LoggerFactory.getLogger(AccountController.class);
+    private final AccountService service;
 
-    private final AccountService accountService;
-
-    public AccountController(AccountService accountService) {
-        this.accountService = accountService;
+    public AccountController(AccountService service) {
+        this.service = service;
     }
+
+    @Operation(summary = "Create a new account (ADMIN only)")
+    @ApiResponse(responseCode = "201", description = "Account created")
+    @ApiResponse(responseCode = "400", description = "Invalid input")
 
     @PostMapping
     public ResponseEntity<Account> createAccount(@RequestBody CreateAccountRequest request) {
-
-        log.info("Received request to create account for {}", request.getOwnerName());
-
-        Account account = accountService.createAccount(request);
-
-        return new ResponseEntity<>(account, HttpStatus.CREATED);
+        return ResponseEntity.status(201).body(service.createAccount(request));
     }
 
+    @Operation(summary = "Deposit money into account")
+    @ApiResponse(responseCode = "200", description = "Deposit successful")
+    @ApiResponse(responseCode = "400", description = "Invalid amount")
 
     @PostMapping("/{id}/deposit")
-    public ResponseEntity<Account> deposit(
-            @PathVariable Long id,
-            @RequestBody AmountRequest request) {
-
-        log.info("Received deposit request for accountId={}", id);
-
-        Account updated = accountService.deposit(id, request.getAmount());
-
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<Account> deposit(@PathVariable Long id,
+                                           @RequestBody AmountRequest request) {
+        return ResponseEntity.ok(service.deposit(id, request.getAmount()));
     }
 
+    @Operation(summary = "Withdraw money from account")
+    @ApiResponse(responseCode = "200", description = "Withdraw successful")
+    @ApiResponse(responseCode = "400", description = "Invalid amount or insufficient balance")
 
     @PostMapping("/{id}/withdraw")
-    public ResponseEntity<Account> withdraw(
-            @PathVariable Long id,
-            @RequestBody AmountRequest request) {
-
-        log.info("Received withdraw request for accountId={}", id);
-
-        Account updated = accountService.withdraw(id, request.getAmount());
-
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<Account> withdraw(@PathVariable Long id,
+                                            @RequestBody AmountRequest request) {
+        return ResponseEntity.ok(service.withdraw(id, request.getAmount()));
     }
 
+    @Operation(summary = "Transfer money between accounts")
+    @ApiResponse(responseCode = "200", description = "Transfer successful")
+    @ApiResponse(responseCode = "400", description = "Invalid request")
 
     @PostMapping("/transfer")
     public ResponseEntity<String> transfer(@RequestBody TransferRequest request) {
-
-        log.info("Received transfer request: from={} to={}",
-                request.getFromAccountId(), request.getToAccountId());
-
-        accountService.transfer(
+        service.transfer(
                 request.getFromAccountId(),
                 request.getToAccountId(),
                 request.getAmount()
         );
-
-        return ResponseEntity.ok("Transfer completed successfully");
+        return ResponseEntity.ok("Transfer completed");
     }
-
 }

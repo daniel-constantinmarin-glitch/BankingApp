@@ -1,10 +1,19 @@
 package org.example.bankingapp.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+
 public class TransferRequest {
 
+    @Schema(example = "1")
     private Long fromAccountId;
+
+    @Schema(example = "2")
     private Long toAccountId;
+
+    @Schema(example = "200")
     private double amount;
+
 
     public Long getFromAccountId() {
         return fromAccountId;

@@ -67,7 +67,7 @@ GET /api/accounts/1
 ```json
 {
   "id": 1,
-  "ownerName": "John Doe",
+  "ownerName": "Daniel Marin",
   "balance": 1000
 }
 ```
