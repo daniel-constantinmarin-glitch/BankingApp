@@ -20,7 +20,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-
         return http
                 .csrf(csrf -> csrf.disable())
 
@@ -29,16 +28,13 @@ public class SecurityConfig {
                 )
 
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.sendError(401, "Unauthorized");
-                        })
-                        .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            response.sendError(403, "Forbidden");
-                        })
+                        .authenticationEntryPoint((request, response, authException) ->
+                                response.sendError(401, "Unauthorized"))
+                        .accessDeniedHandler((request, response, accessDeniedException) ->
+                                response.sendError(403, "Forbidden"))
                 )
 
                 .authorizeHttpRequests(auth -> auth
-
 
                         .requestMatchers(
                                 "/v3/api-docs/**",
@@ -46,17 +42,22 @@ public class SecurityConfig {
                                 "/swagger-ui.html"
                         ).permitAll()
 
+                        // Auth endpoints (public)
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        // ADMIN only
+                        // ADMIN endpoints (important!)
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                        // Account management (ADMIN only)
                         .requestMatchers(HttpMethod.POST, "/api/accounts").hasRole("ADMIN")
-                        .requestMatchers("/api/accounts/transfer").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/accounts/transfer").hasRole("ADMIN")
 
+                        // USER operations
+                        .requestMatchers(HttpMethod.POST, "/api/accounts/*/deposit")
+                        .hasAnyRole("USER", "ADMIN")
 
-                        // USER + ADMIN
-                        .requestMatchers("/api/accounts/*/deposit").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/api/accounts/*/withdraw").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/accounts/*/withdraw")
+                        .hasAnyRole("USER", "ADMIN")
 
                         .anyRequest().authenticated()
                 )
@@ -67,6 +68,5 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 
                 .build();
-
     }
 }
