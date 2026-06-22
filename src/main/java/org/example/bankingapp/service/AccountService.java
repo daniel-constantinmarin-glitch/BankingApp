@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class AccountService {
 
@@ -145,5 +147,11 @@ public class AccountService {
 
         log.info("Transfer successful: {} -> {} amount={}", fromId, toId, amount);
     }
+
+
+    public List<Account> getAllAccounts() {
+        return accountRepository.findAll();
+    }
+
 
 }
